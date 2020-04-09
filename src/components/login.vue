@@ -62,7 +62,7 @@ export default {
     // 登陆
     login () {
       // console.log(this)
-      this.$refs.loginFormRef.validate(async valid => {
+      this.$refs.loginFormRef.validate(async (valid) => {
         // console.log(valid)
         if (!valid) return
         const { data: res } = await this.$http.post('/login', this.loginForm)

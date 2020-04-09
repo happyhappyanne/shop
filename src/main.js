@@ -6,12 +6,19 @@ import '../src/assets/global.css'
 // 字体图标
 import '../src/assets/fonts/iconfont.css'
 import './plugins/element.js'
-import axios from 'axios'
+// import axios from 'axios'
 
 // 请求地址
-axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
-Vue.prototype.$http = axios
+// axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+// axios.interceptors.request.use(config => {
+//   // console.log(config)
+//   config.headers.Authorization = window.sessionStorage.getItem('token')
+//   console.log(config)
+// })
+// Vue.prototype.$http = axios
 Vue.config.productionTip = false
+
+Vue.config.devtools = true
 
 new Vue({
   router,

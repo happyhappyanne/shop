@@ -1,6 +1,6 @@
 {
+  "eslintIntegration": false,
   "semi": false,
   "singleQuote": true,
-  "printWidth": 200,
-  "newline": false
+  "space-before-function-parent": 0
 }

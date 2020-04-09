@@ -1,4 +1,4 @@
-'use strict'
+// 'use strict'
 
 import Vue from 'vue'
 import axios from 'axios'
@@ -9,16 +9,19 @@ import axios from 'axios'
 // axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 const config = {
-  // baseURL: process.env.baseURL || process.env.apiUrl || ""
+  // /baseURL: process.env.baseURL || process.env.apiUrl || ""
+  // axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
   // timeout: 60 * 1000, // Timeout
   // withCredentials: true, // Check cross-site Access-Control
 }
-
+axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 const _axios = axios.create(config)
 
 _axios.interceptors.request.use(
   function (config) {
     // Do something before request is sent
+    // console.log(config)
+    config.headers.Authorization = window.sessionStorage.getItem('token')
     return config
   },
   function (error) {
@@ -56,6 +59,7 @@ Plugin.install = function (Vue, options) {
   })
 }
 
-Vue.use(Plugin)
+// Vue.use(Plugin)
+Vue.prototype.$http = _axios
 
 export default Plugin
