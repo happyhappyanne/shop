@@ -74,7 +74,7 @@
             <el-button type="warning"
                        icon="el-icon-s-tools"
                        size="mini"
-                       @click="roleTreeVisible=true">分配权限</el-button>
+                       @click="getTreeRights(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -126,20 +126,22 @@
 
     <!-- 分配权限树形控件 -->
     <el-dialog title="分配权限"
-               :visible.sync="roleTreeVisible">
+               :visible.sync="roleTreeVisible"
+               @close="setRightDialog">
       <!-- 树形控件 -->
-      <el-tree :data="rolesList"
+      <el-tree :data="treeRights"
                show-checkbox
                node-key="id"
-               :default-expanded-keys="[2, 3]"
-               :default-checked-keys="[5]"
-               :props="defaultProps">
+               default-expand-all
+               :default-checked-keys="defaultChecked"
+               :props="defaultProps"
+               ref="tree">
       </el-tree>
       <span slot="footer"
             class="dialog-footer">
         <el-button @click=" roleTreeVisible = false">取 消</el-button>
         <el-button type="primary"
-                   @click="roleTreeVisible = false">确 定</el-button>
+                   @click="editRights">确 定</el-button>
       </span>
     </el-dialog>
 
@@ -166,7 +168,15 @@ export default {
         children: 'children'
       },
       // 权限树形控件配置 显示状态
-      roleTreeVisible: false
+      roleTreeVisible: false,
+      // 树形权限
+      treeRights: [],
+      // 默认展开的树形节点
+      defaultExpanded: [],
+      // 默认选中的树形节点
+      defaultChecked: [],
+      // 当前用户roleID
+      roleId: null
     }
   },
   methods: {
@@ -233,6 +243,53 @@ export default {
     // 重置编辑弹窗
     resetEditField () {
       this.$refs.editRole.resetFields()
+    },
+    // 显示分配权限弹窗
+    showRoleTreeDialog () {
+      this.roleTreeVisible = true
+    },
+    // 隐藏分配权限弹窗
+    hideRoleTreeDialog () {
+      this.roleTreeVisible = false
+    },
+    getChildren (arr, node) {
+      if (!node.children) {
+        return arr.push(node.id)
+      }
+      node.children.forEach(item => {
+        console.log(item)
+        this.getChildren(arr, item)
+      })
+    },
+    // 获取树形权限
+    async getTreeRights (role) {
+      this.roleId = role.id
+      console.log('roleId' + this.roleId)
+      this.showRoleTreeDialog()
+      const { data: res } = await this.$http.get('rights/tree')
+      // console.log(res)
+      if (res.meta.status !== 200) return this.$message.error('获取权限失败')
+      this.treeRights = res.data
+      // console.log(this.treeRights)
+      // 默认选中的树形节点
+      this.getChildren(this.defaultChecked, role)
+    },
+    // 编辑权限
+    async editRights () {
+      // console.log('ok')
+      const rids = [this.$refs.tree.getCheckedKeys(), this.$refs.tree.getHalfCheckedKeys()].join(',')
+      // console.log(rids)
+      const { data: res } = await this.$http.post(`roles/${this.roleId}/rights`, {
+        rids: rids
+      })
+      if (res.meta.status !== 200) return this.$message.error('编辑权限失败')
+      this.$message.success('更新成功')
+      this.getRolesList()
+      this.hideRoleTreeDialog()
+    },
+    // 监听权限对话框关闭
+    setRightDialog () {
+      this.defaultChecked = []
     }
   },
   created () {
