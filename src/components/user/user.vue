@@ -48,19 +48,39 @@
         </el-table-column>
         <el-table-column label="操作"
                          width="180">
-          <el-button type="primary"
-                     icon="el-icon-edit"
-                     size="mini"></el-button>
-          <el-button type="danger"
-                     icon="el-icon-delete"
-                     size="mini"></el-button>
-          <el-button type="warning"
-                     icon="el-icon-s-tools"
-                     size="mini"></el-button>
+          <template slot-scope="scope">
+            <el-tooltip class="item"
+                        effect="dark"
+                        content="编辑用户"
+                        placement="top">
+              <el-button type="primary"
+                         icon="el-icon-edit"
+                         size="mini"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item"
+                        effect="dark"
+                        content="删除用户"
+                        placement="top">
+              <el-button type="danger"
+                         icon="el-icon-delete"
+                         size="mini"></el-button>
+            </el-tooltip>
+            <el-tooltip class="item"
+                        effect="dark"
+                        content="编辑权限"
+                        placement="top">
+              <el-button type="warning"
+                         icon="el-icon-s-tools"
+                         size="mini"
+                         @click="showEditRightDialog(scope.row)"></el-button>
+            </el-tooltip>
+          </template>
+
         </el-table-column>
       </el-table>
-
-      <!-- 分页区域 -->
+      <!--
+                       分页区域
+                       -->
       <el-row>
         <el-col :span="8">
           <el-pagination @size-change="handleSizeChange"
@@ -111,6 +131,34 @@
                    @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 编辑用户权限弹窗 -->
+    <el-dialog title="编辑用户权限"
+               :visible.sync="editRightsDialog"
+               @close="clearEditDialog">
+      <div>
+        <p>当前的用户：{{editRightUserInfo.username}}</p>
+        <p>当前的角色：{{editRightUserInfo.role_name}}</p>
+        <p>
+          <span>分配新角色</span>
+          <el-select v-model="rid"
+                     placeholder="请选择">
+            <el-option v-for="item in roleList"
+                       :key="item.id"
+                       :label="item.roleName"
+                       :value="item.id">
+            </el-option>
+          </el-select>
+        </p>
+      </div>
+      <span slot="footer"
+            class="dialog-footer">
+        <el-button @click="editRightsDialog = false">取 消</el-button>
+        <el-button type="primary"
+                   @click="editRights">确 定</el-button>
+      </span>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -149,7 +197,15 @@ export default {
         ],
         email: [{ required: true, message: '邮箱不能为空', trigger: 'blur' }],
         mobile: [{ required: true, message: '手机号不能为空', trigger: 'blur' }]
-      }
+      },
+      // 编辑用户权限dialog显示
+      editRightsDialog: false,
+      // 编辑权限用户
+      editRightUserInfo: {},
+      // 角色列表
+      roleList: [],
+      // 编辑用户角色id
+      rid: null
     }
   },
   methods: {
@@ -200,6 +256,36 @@ export default {
     // 重置表单
     reSetForm () {
       this.$refs.ruleForm.resetFields()
+    },
+    // 编辑用户权限
+    async editRights () {
+      const { data: res } = await this.$http.put(`users/${this.editRightUserInfo.id}/role`, { rid: this.rid })
+      // console.log(res)
+      if (res.meta.status !== 200) return this.$message.error('编辑用户角色失败')
+      this.$message.success('编辑用户角色成功')
+      this.hideEditRightDialog()
+    },
+    // 显示编辑用户权限弹窗
+    showEditRightDialog (user) {
+      this.editRightUserInfo = user
+      // console.log(user)
+      this.editRightsDialog = true
+      this.getRolesList()
+    },
+    // 隐藏编辑用户权限弹窗
+    hideEditRightDialog () {
+      this.editRightsDialog = false
+    },
+    // 获取角色列表
+    async getRolesList () {
+      const { data: res } = await this.$http.get('roles')
+      // console.log('11' + res)
+      if (res.meta.status !== 200) return this.$message.error('获取用户角色失败')
+      this.roleList = res.data
+    },
+    // 清空select选择器
+    clearEditDialog () {
+      this.rid = null
     }
   },
   created () {
@@ -207,4 +293,8 @@ export default {
   }
 }
 </script>
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+.el-dialog {
+  text-align: left;
+}
+</style>
