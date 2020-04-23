@@ -7,6 +7,11 @@ import '../src/assets/global.css'
 import '../src/assets/fonts/iconfont.css'
 import './plugins/element.js'
 // import axios from 'axios'
+import VueQuillEditor from 'vue-quill-editor'
+// require styles 导入富文本编辑器对应的样式
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 // 请求地址
 // axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
@@ -19,7 +24,7 @@ import './plugins/element.js'
 Vue.config.productionTip = false
 
 Vue.config.devtools = true
-
+Vue.use(VueQuillEditor)
 new Vue({
   router,
   render: h => h(App)

@@ -2,45 +2,42 @@
   <el-container>
     <el-header>
       <div>
-        <img src="../assets/heima.png" alt />
+        <img src="../assets/heima.png"
+             alt />
         <span>后台管理系统</span>
       </div>
-      <el-button type="info" @click="logout">退出</el-button>
+      <el-button type="info"
+                 @click="logout">退出</el-button>
     </el-header>
     <el-container>
       <el-aside :width="!isCollapse ? '200px' : '64px'">
-        <div class="toggle-button" @click="toggleCollapse">
+        <div class="toggle-button"
+             @click="toggleCollapse">
           |||
         </div>
         <el-row class="tac">
           <el-col>
-            <el-menu
-              class="el-menu-vertical-demo"
-              background-color="#373d41"
-              text-color="#fff"
-              active-text-color="#409EFF"
-              :default-active="activePath"
-              unique-opened
-              router
-              :collapse="isCollapse"
-              :collapse-transition="false"
-            >
-              <el-submenu
-                :index="item.id + ''"
-                v-for="item in menuList"
-                :key="item.id"
-              >
+            <el-menu class="el-menu-vertical-demo"
+                     background-color="#373d41"
+                     text-color="#fff"
+                     active-text-color="#409EFF"
+                     :default-active="activePath"
+                     unique-opened
+                     router
+                     :collapse="isCollapse"
+                     :collapse-transition="false">
+              <el-submenu :index="item.id + ''"
+                          v-for="item in menuList"
+                          :key="item.id">
                 <!-- 一级菜单 -->
                 <template slot="title">
                   <i :class="iconObj[item.id]"></i>
                   <span>{{ item.authName }}</span>
                 </template>
-                <el-menu-item
-                  :index="'/' + subItem.path"
-                  v-for="subItem in item.children"
-                  :key="subItem.id"
-                  @click="saveNavState('/' + subItem.path)"
-                >
+                <el-menu-item :index="'/' + subItem.path"
+                              v-for="subItem in item.children"
+                              :key="subItem.id"
+                              @click="saveNavState('/' + subItem.path)">
                   <!-- 二级菜单 -->
                   <template>
                     <i class="el-icon-menu"></i>
@@ -60,7 +57,7 @@
 </template>
 <script>
 export default {
-  data() {
+  data () {
     return {
       menuList: {},
       // 左侧菜单icon
@@ -79,12 +76,12 @@ export default {
   },
   methods: {
     // 退出登陆
-    logout() {
+    logout () {
       window.sessionStorage.clear()
       this.$router.push('/login')
     },
     // 获取左侧菜单
-    async getMenuList() {
+    async getMenuList () {
       const { data: res } = await this.$http.get('menus')
       // console.log(res)
       if (res.meta.status !== 200) {
@@ -94,17 +91,17 @@ export default {
       //   console.log(this.menuList)
     },
     // 保存当前点击的路径
-    saveNavState(activePath) {
+    saveNavState (activePath) {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
     },
     // 切换菜单
-    toggleCollapse() {
+    toggleCollapse () {
       this.isCollapse = !this.isCollapse
       console.log(this.isCollapse)
     }
   },
-  created() {
+  created () {
     this.getMenuList()
   }
 }
@@ -138,7 +135,7 @@ export default {
   text-align: center;
   line-height: 200px;
   .el-menu {
-    width: 100%;
+    border-right: none;
   }
   .el-submenu {
     i {
